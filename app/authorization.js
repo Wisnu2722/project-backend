@@ -60,8 +60,6 @@ export const PermissionAssignment = {
         Permission.BROWSE_ORDER_ITEMS,
         Permission.READ_ORDER_ITEM,
 
-
-
     ],
 
     [Role.REGULAR_USER]: [

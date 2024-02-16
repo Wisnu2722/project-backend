@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../prisma.js";
 import { Permission } from '../authorization.js'
 import authToken from "../middlewares/auth-token.js";
 import authorizePermission from "../middlewares/auth-permission.js";
 
-const prisma = new PrismaClient();
-
 const router = Router();
-router.get("/products",authToken, authorizePermission(Permission.BROWSE_PRODUCTS), async (req, res) => {
+router.use(authToken);
+
+router.get("/products", authorizePermission(Permission.BROWSE_PRODUCTS), async (req, res) => {
     const products = await prisma.product.findMany({
         include: {
             category: {
@@ -25,7 +25,7 @@ router.get("/products",authToken, authorizePermission(Permission.BROWSE_PRODUCTS
     res.json({ message: "data products", products: products });
 });
 
-router.post("/products", authToken, authorizePermission(Permission.ADD_PRODUCTS), async (req, res) => {
+router.post("/products",  authorizePermission(Permission.ADD_PRODUCTS), async (req, res) => {
     const { name, category_id, price, in_stock, description } = req.body;
     if ((!name, !category_id, !price, !in_stock, !description)) {
         return res.status(400).json({

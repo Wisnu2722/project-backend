@@ -7,13 +7,15 @@ import validateTokenRequest from "../middlewares/token-validator.js";
 
 const router = Router();
 
+/* The code block `router.post('/login', validateTokenRequest, async (req, res) => { ... })` is
+defining a route handler for the POST request to the '/login' endpoint. */
 router.post('/login', validateTokenRequest, async (req, res) => {
     const user = await prisma.user.findUnique({
         where: { email: req.body.email },
     });
     if (!user) {
         return res.status(401).json({
-            message: 'Invalid email'
+            message: 'Invalid credential'
         })
     }
     if (user.is_blocked) {
@@ -25,7 +27,7 @@ router.post('/login', validateTokenRequest, async (req, res) => {
     const validPassword = bcrypt.compareSync(req.body.password, user.password)
     if (!validPassword) {
         return res.status(401).json({
-            message: 'Invalid password'
+            message: 'Invalid credential'
         })
     }
 

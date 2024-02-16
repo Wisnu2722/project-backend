@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { faker } from "@faker-js/faker"
-import { PrismaClient } from "@prisma/client";
+import prisma from "../prisma.js";
 import { Permission } from '../authorization.js'
 import authToken from "../middlewares/auth-token.js";
 import authorizePermission from "../middlewares/auth-permission.js";
 
-const prisma = new PrismaClient();
 const router = Router();
+router.use(authToken);
 
 router.get("/categories", async (req, res) => {
     const categories = await prisma.category.findMany();

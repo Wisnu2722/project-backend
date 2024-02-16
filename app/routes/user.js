@@ -7,6 +7,7 @@ import authorizePermission from "../middlewares/auth-permission.js";
 
 
 const router = Router();
+router.use(authToken);
 
 router.get("users", async  (req, res) => {
     const users = await prisma.user.findMany({});

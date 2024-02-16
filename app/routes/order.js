@@ -1,34 +1,37 @@
 import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../prisma.js";
 import { Permission } from '../authorization.js'
 import authToken from "../middlewares/auth-token.js";
 import authorizePermission from "../middlewares/auth-permission.js";
 
-const prisma = new PrismaClient();
-
 const router = Router();
+router.use(authToken);
 
-router.get("/orders", async (req, res) => {
+router.get("/orders",  async (req, res) => {
     const orders = await prisma.order.findMany({
+        where: { user_id: Number(req.user.id) },
         orderBy: { date: "desc" },
     });
     res.json(orders);
 });
 
-router.post("/orders", authToken, async (req, res) => {
+router.post("/checkout",  async (req, res) => {
     try {
+
+        const user_id = Number(req.user.id)
         const cartData = await prisma.cart.findMany({
-            where: { user_id: 4 },
+            where: { user_id: user_id },
             include: { product: true },
         });
+
 
         const total = cartData.reduce((acc, item) => acc + item.total, 0);
 
         const order = await prisma.order.create({
             data: {
-                user_id: 4,
+                user_id: user_id,
                 date: new Date(),
-                number: `ABC/${Math.floor(Math.random() * 1000)}`,
+                number: `ORD/${Math.floor(Math.random() * 1000)}`,
                 total,
             },
         });

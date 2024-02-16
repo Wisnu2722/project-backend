@@ -1,12 +1,11 @@
-import prisma from "../prisma.js"
-
 /**
-+ * Authorize a user's permission for a given operation.
-+ *
-+ * @param {string} permission - the permission to be authorized
-+ * @return {Promise<void>} - a promise that resolves to nothing
-+ */
+ + * Authorize a user's permission for a given operation.
+ + *
+ + * @param {string} permission - the permission to be authorized
+ + * @return {Promise<void>} - a promise that resolves to nothing
+ + */
 
+import prisma from "../prisma.js"
 
 const authorizePermission = (permission) => {
     return async (req, res, next) => {
