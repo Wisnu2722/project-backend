@@ -1,5 +1,8 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
+import { Permission } from '../authorization.js'
+import authToken from "../middlewares/auth-token.js";
+import authorizePermission from "../middlewares/auth-permission.js";
 
 const prisma = new PrismaClient();
 
@@ -12,7 +15,7 @@ router.get("/orders", async (req, res) => {
     res.json(orders);
 });
 
-router.post("/orders", async (req, res) => {
+router.post("/orders", authToken, async (req, res) => {
     try {
         const cartData = await prisma.cart.findMany({
             where: { user_id: 4 },

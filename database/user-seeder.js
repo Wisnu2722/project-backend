@@ -1,3 +1,8 @@
+/**
+ * The main function deletes all users from the database and then creates 5 new users with random
+ * email, name, password, and role.
+ */
+
 import { faker } from '@faker-js/faker'
 import bcrypt from 'bcrypt'
 import { config } from 'dotenv'

@@ -1,5 +1,8 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
+import { Permission } from '../authorization.js'
+import authToken from "../middlewares/auth-token.js";
+import authorizePermission from "../middlewares/auth-permission.js";
 
 const prisma = new PrismaClient();
 
@@ -27,8 +30,13 @@ router.get("/cart", async (req, res) => {
     res.json({ message: "Data Cart", cart });
 });
 
-router.post("/cart", async (req, res) => {
-    const { product_id, quantity } = req.body;
+router.post("/add-to-cart", authToken, async (req, res) => {
+    
+    
+    const {product_id, quantity } = req.body;
+
+    // console.log(req.user);
+    // res.json({ user: req.user });
 
     const product = await prisma.product.findUnique({
         where: { id: Number(product_id) },
@@ -55,12 +63,13 @@ router.post("/cart", async (req, res) => {
         return res.json({ message: "Cart updated successfully" });
     }
 
+    const user_id = req.user.id
     const cart = await prisma.cart.create({
         data: {
             product_id: product_id,
             quantity: quantity,
             total: total,
-            user_id: 4,
+            user_id: user_id,
         },
     });
 
@@ -74,7 +83,7 @@ router.delete("/cart/:id", async (req, res) => {
         await prisma.cart.delete({
             where: { id: Number(id) },
         });
-        res.json({ message: "Cart deleted successfully" });
+        res.json({ message: "Cart successfully deleted" });
     } catch (err) {
         res.status(404).json({ message: "Cart item not found" });
     }

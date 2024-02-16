@@ -2,7 +2,7 @@ import { Router } from "express";
 import prisma from "../prisma.js";
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
-import validateTokenRequest from "../middlewares/validator.js";
+import validateTokenRequest from "../middlewares/token-validator.js";
 
 
 const router = Router();
@@ -38,7 +38,7 @@ router.post('/login', validateTokenRequest, async (req, res) => {
         data: {
             token,
             user_id: user.id,
-            expires_at: new Date(Date.now() + 300)
+            expires_at: new Date(Date.now() + 2592000000)
         }
     })
 

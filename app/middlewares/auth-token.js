@@ -46,3 +46,5 @@ export const authToken = async (req, res, next) => {
 
     next()
 }
+
+export default authToken

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `categories` MODIFY `updated_at` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0);

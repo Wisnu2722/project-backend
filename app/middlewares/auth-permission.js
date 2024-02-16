@@ -8,7 +8,7 @@ import prisma from "../prisma.js"
 + */
 
 
-export const authorizePermission = (permission) => {
+const authorizePermission = (permission) => {
     return async (req, res, next) => {
         if (!req.user) {
             return res.status(401).json({
@@ -35,3 +35,5 @@ export const authorizePermission = (permission) => {
         next()
     }
 }
+
+export default authorizePermission
