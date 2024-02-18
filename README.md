@@ -111,6 +111,13 @@ user with `seller` role, have permission:
 - display orders
 - display order items
 
+
+## Categories Endpoints
+### browse category
+*Request Method :* `GET`
+
+api endpoint : `http://localhost:4200/categories`
+
 ## Products Endpoints
 ### browse product
 *Request Method :* `GET`
@@ -152,4 +159,22 @@ api endpoint : `http://localhost:4200/products`
 }
 ```
 
-### add product
+## Cart Endpoints
+### browse cart
+*Request Method :* `GET`
+
+api endpoint : `http://localhost:4200/cart`
+
+## Orders Endpoints
+### browse order
+*Request Method :* `GET`
+
+api endpoint : `http://localhost:4200/orders`
+
+
+## Orders Endpoints
+### browse order
+*Request Method :* `GET`
+
+api endpoint : `http://localhost:4200/orders`
+

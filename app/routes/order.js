@@ -30,6 +30,37 @@ router.get("/orders", authToken, async (req, res) => {
     }
 });
 
+router.get("order/items/:id", authToken, async (req, res) => {
+    const id = req.params.id;
+    if(isNaN(id)){
+        return res.status(400).json({message:'Invalid ID'})
+    }
+    if(id !== req.user.id){
+        return res.status(403).json({message:'Forbidden'})
+    }
+    try {
+        const items = await prisma.orderitem.findMany({
+            where: { order_id: Number(id) },
+            include: {
+                product: {
+                    select: {
+                        name: true,
+                        price: true,
+                        category: {
+                            select: {
+                                name: true,
+                            }
+                        }
+                    }
+                }
+            },
+        })
+        res.status(200).json({ items: items });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }  
+})
+
 router.get("/checkout", authToken, authorizePermission(Permission.EDIT_ORDER), async (req, res) => {
     const user_id = Number(req.user.id)
 
@@ -165,7 +196,6 @@ router.post("/pay", authToken, async (req, res) => {
             error: "Invalid card number"
         });
     }
-}
-);
+});
 
 export default router;
