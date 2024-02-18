@@ -9,6 +9,7 @@ import prisma from "../prisma.js"
 
 const authorizePermission = (permission) => {
     return async (req, res, next) => {
+        
         if (!req.user) {
             return res.status(401).json({
                 message: 'Unauthorized'
@@ -22,8 +23,8 @@ const authorizePermission = (permission) => {
 
         const permissions = permissionRecords.map((record) => record.permission.name)
 
-        console.log('looking for permission', permission)
-        console.log('in permissions', permissions)
+        // console.log('looking for permission', permission)
+        // console.log('in permissions', permissions)
 
         if (!permissions.includes(permission)) {
             return res.status(403).json({

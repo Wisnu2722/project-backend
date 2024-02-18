@@ -5,25 +5,51 @@ import authToken from "../middlewares/auth-token.js";
 import authorizePermission from "../middlewares/auth-permission.js";
 
 const router = Router();
-router.use(authToken);
 
-router.get("/orders",  async (req, res) => {
-    const orders = await prisma.order.findMany({
-        where: { user_id: Number(req.user.id) },
-        orderBy: { date: "desc" },
-    });
-    res.json(orders);
-});
-
-router.post("/checkout",  async (req, res) => {
+router.get("/orders", authToken, async (req, res) => {
     try {
-
-        const user_id = Number(req.user.id)
-        const cartData = await prisma.cart.findMany({
-            where: { user_id: user_id },
-            include: { product: true },
+        const orders = await prisma.order.findMany({
+            select: {
+                id: true,
+                number: true,
+                created_at: true,
+                total: true,
+            },
+            where: { user_id: Number(req.user.id) },
+            orderBy: { created_at: "desc" },
         });
 
+        if (orders.length === 0) {
+            return res.status(404).json({ message: 'you dont have any orders' })
+        }
+
+        res.json({orders:orders});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.get("/checkout", authToken, async (req, res) => {
+    const user_id = Number(req.user.id)
+    
+    try {
+        const cartData = await prisma.cart.findMany({
+            where: { user_id: user_id },
+            include: {
+                product: {
+                    select: {
+                        name: true,
+                        price: true,
+                        category: {
+                            select: {
+                                name: true,
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: { created_at: "desc" },
+        });
 
         const total = cartData.reduce((acc, item) => acc + item.total, 0);
 
@@ -48,16 +74,23 @@ router.post("/checkout",  async (req, res) => {
 
         await prisma.orderItem.createMany({ data: orderItems });
 
-        // await prisma.cart.deleteMany();
-        // res status and message
-        res.json({
-            message: "Order created successfully",
-        })
+        await prisma.cart.deleteMany({
+            where: { user_id: user_id },
+        });
 
-        res.json({ message: "Order created successfully", order });
+        res.status(200).json({ message: "Order created successfully", order });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
+});
+
+router.post("/order/pay", authToken,  async (req, res) => {
+    const {order_id, amount, cardNumber, cvv, expiryMonth, expiryYear} = req.body
+    vali
+    await prisma.order.update({
+        where: { id: Number(order_id) },
+    }) 
+
 });
 
 export default router;

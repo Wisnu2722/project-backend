@@ -5,13 +5,12 @@ import authToken from "../middlewares/auth-token.js";
 import authorizePermission from "../middlewares/auth-permission.js";
 
 const router = Router();
-router.use(authToken);
 
-router.get("/products", authorizePermission(Permission.BROWSE_PRODUCTS), async (req, res) => {
+router.get("/products",  authorizePermission(Permission.BROWSE_PRODUCTS), async (req, res) => {
     const products = await prisma.product.findMany({
         include: {
             category: {
-                select: {
+                include: {
                     name: true,
                 },
             },
@@ -48,13 +47,13 @@ router.post("/products",  authorizePermission(Permission.ADD_PRODUCTS), async (r
     }
 });
 
-router.get("/products/:id", async (req, res) => {
+router.get("/products/:id", authorizePermission(Permission.READ_PRODUCT), async (req, res) => {
     const productsId = req.params.id;
     if (isNaN(productsId)) {
         res.status(400).json({ message: "Invalid ID" });
         return;
     }
-
+    
     const product = await prisma.product.findFirst({
         where: { id: Number(productsId) },
         include: {
@@ -97,7 +96,7 @@ router.put("/products/:id", async (req, res) => {
     }
 });
 
-router.delete("/products/:id", async (req, res) => {
+router.delete("/products/:id", authToken, authorizePermission(Permission.DELETE_PRODUCT), async (req, res) => {
     const productId = req.params.id;
     try {
         const product = await prisma.product.delete({
@@ -107,11 +106,12 @@ router.delete("/products/:id", async (req, res) => {
     } catch (err) {
         res.status(404).json({ message: "Data Product Not Found" });
     }
+    
 });
 
-// search product by name
-router.get("/products/search", async (req, res) => {
-    const { keyword } = req.query.search;
+
+router.get("/products/search", authorizePermission(Permission.BROWSE_PRODUCTS), async (req, res) => {
+    const keyword  = req.query.search;
     const products = await prisma.product.findMany({
         where: {
             name: {

@@ -6,15 +6,18 @@ import authorizePermission from "../middlewares/auth-permission.js";
 
 
 const router = Router();
-router.use(authToken);
 
-router.get("/cart",  async (req, res) => {
+router.get("/cart", authToken, authorizePermission(Permission.READ_CART), async (req, res) => {
     const cart = await prisma.cart.findMany({
-        where: { user_id: Number(req.user.id) },
         include: {
             product: {
                 select: {
                     name: true,
+                    category: {
+                        select: {
+                            name: true,
+                        },
+                    },
                 },
             },
             user: {
@@ -23,6 +26,7 @@ router.get("/cart",  async (req, res) => {
                 },
             },
         },
+        where: { user_id: Number(req.user.id) },
     });
     if (cart.length === 0) {
         return res.status(404).json({
@@ -32,8 +36,7 @@ router.get("/cart",  async (req, res) => {
     res.status(200).json({ message: "Data Cart", cart });
 });
 
-router.post("/add-to-cart",  authorizePermission(Permission.ADD_TO_CART), async (req, res) => {
-
+router.post("/add-to-cart", authToken, authorizePermission(Permission.ADD_TO_CART), async (req, res) => {
 
     const { product_id, quantity } = req.body;
 
@@ -45,19 +48,18 @@ router.post("/add-to-cart",  authorizePermission(Permission.ADD_TO_CART), async 
         return res.status(404).json({ message: "Product not found" });
     }
 
-
     if (product.in_stock == false) {
         return res.status(400).json({ message: "Product is Out of stock" });
     }
-    res.json({ product });
 
     const existingCart = await prisma.cart.findFirst({
         where: { product_id: Number(product_id) },
     });
 
+    
     let total = product.price * quantity;
 
-    if (existingCart) {
+    if (existingCart && existingCart.user_id == req.user.id) {
         const newQuantity = existingCart.quantity + quantity;
         total = product.price * newQuantity;
         await prisma.cart.update({
@@ -69,7 +71,7 @@ router.post("/add-to-cart",  authorizePermission(Permission.ADD_TO_CART), async 
     }
 
     const user_id = req.user.id
-    const cart = await prisma.cart.create({
+    const cartData = await prisma.cart.createMany({
         data: {
             product_id: product_id,
             quantity: quantity,
@@ -78,26 +80,26 @@ router.post("/add-to-cart",  authorizePermission(Permission.ADD_TO_CART), async 
         },
     });
 
-    res.json({ message: "item add to cart successfully", cart });
+    res.json({ message: "item  successfully added to cart" });
 });
 
-router.post("/cart/remove-item",  async (req, res) => {
+router.delete("/cart/:id", authToken, authorizePermission(Permission.DELETE_CART), async (req, res) => {
+
     const user_id = req.user.id
-    const { product_id } = req.body;
+    const { id } = req.params;
 
     try {
-        await prisma.cart.delete({
-            where: { user_id: Number(user_id), product_id: Number(product_id) },
-        })
+        const deletedItem = await prisma.cart.delete({
+            where: {
+                id: Number(id),
+                user_id: Number(user_id),
+            },
+        });
+        res.status(200).json({ message: "Item successfully removed from cart" });
 
-        res.status(200).json({ message: "Item successfully removed" });
     } catch (err) {
-        res.status(404).json({ message: "Item not found" });
+        res.status(404).json({ message: "Cart item not found" });
     }
 });
 
-// router.delete("/cart", async (req, res) => {
-//     await prisma.cart.deleteMany();
-//     res.json({ message: "Cart emptied successfully" });
-// });
 export default router;

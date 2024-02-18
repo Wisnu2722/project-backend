@@ -6,7 +6,7 @@ import authToken from "../middlewares/auth-token.js";
 import authorizePermission from "../middlewares/auth-permission.js";
 
 const router = Router();
-router.use(authToken);
+// router.use(authToken);
 
 router.get("/categories", async (req, res) => {
     const categories = await prisma.category.findMany();

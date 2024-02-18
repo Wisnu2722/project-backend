@@ -62,3 +62,5 @@ const validatePaymentRequest = (req, res, next) => {
 
     next()
 }
+
+export default validatePaymentRequest
