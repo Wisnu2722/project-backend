@@ -172,9 +172,8 @@ api endpoint : `http://localhost:4200/cart`
 api endpoint : `http://localhost:4200/orders`
 
 
-## Orders Endpoints
-### browse order
-*Request Method :* `GET`
+## Pay Endpoints
+*Request Method :* `Post`
 
-api endpoint : `http://localhost:4200/orders`
+api endpoint : `http://localhost:4200/pay`
 
