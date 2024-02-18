@@ -116,3 +116,40 @@ user with `seller` role, have permission:
 *Request Method :* `GET`
 
 api endpoint : `http://localhost:4200/products`
+
+*example response :*
+```json
+{
+    "message": "data products",
+    "products": [
+        {
+            "id": 2,
+            "name": "Electronic Rubber Computer",
+            "category_id": 1,
+            "price": 650,
+            "in_stock": true,
+            "description": "Boston's most advanced compression wear technology increases muscle oxygenation, stabilizes active muscles",
+            "created_at": "2024-02-18T09:13:24.000Z",
+            "updated_at": "2024-02-18T09:13:23.969Z",
+            "category": {
+                "name": "gadget"
+            }
+        },
+        {
+            "id": 3,
+            "name": "Modern Plastic Salad",
+            "category_id": 1,
+            "price": 728,
+            "in_stock": true,
+            "description": "The slim & simple Maple Gaming Keyboard from Dev Byte comes with a sleek body and 7- Color RGB LED Back-lighting for smart functionality",
+            "created_at": "2024-02-18T09:13:24.000Z",
+            "updated_at": "2024-02-18T09:13:23.973Z",
+            "category": {
+                "name": "gadget"
+            }
+        }
+    ]
+}
+```
+
+### add product

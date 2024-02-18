@@ -23,8 +23,8 @@ const authorizePermission = (permission) => {
 
         const permissions = permissionRecords.map((record) => record.permission.name)
 
-        // console.log('looking for permission', permission)
-        // console.log('in permissions', permissions)
+        console.log('looking for permission', permission)
+        console.log('in permissions', permissions)
 
         if (!permissions.includes(permission)) {
             return res.status(403).json({

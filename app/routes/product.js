@@ -6,11 +6,11 @@ import authorizePermission from "../middlewares/auth-permission.js";
 
 const router = Router();
 
-router.get("/products",  authorizePermission(Permission.BROWSE_PRODUCTS), async (req, res) => {
+router.get("/products", async (req, res) => {
     const products = await prisma.product.findMany({
         include: {
             category: {
-                include: {
+                select: {
                     name: true,
                 },
             },
@@ -24,7 +24,7 @@ router.get("/products",  authorizePermission(Permission.BROWSE_PRODUCTS), async 
     res.json({ message: "data products", products: products });
 });
 
-router.post("/products",  authorizePermission(Permission.ADD_PRODUCTS), async (req, res) => {
+router.post("/products", authToken, authorizePermission(Permission.ADD_PRODUCTS), async (req, res) => {
     const { name, category_id, price, in_stock, description } = req.body;
     if ((!name, !category_id, !price, !in_stock, !description)) {
         return res.status(400).json({
@@ -47,13 +47,13 @@ router.post("/products",  authorizePermission(Permission.ADD_PRODUCTS), async (r
     }
 });
 
-router.get("/products/:id", authorizePermission(Permission.READ_PRODUCT), async (req, res) => {
+router.get("/products/:id", async (req, res) => {
     const productsId = req.params.id;
     if (isNaN(productsId)) {
         res.status(400).json({ message: "Invalid ID" });
         return;
     }
-    
+
     const product = await prisma.product.findFirst({
         where: { id: Number(productsId) },
         include: {
@@ -70,7 +70,7 @@ router.get("/products/:id", authorizePermission(Permission.READ_PRODUCT), async 
     res.json({ message: "Data Products By ID", product });
 });
 
-router.put("/products/:id", async (req, res) => {
+router.put("/products/:id", authToken, authorizePermission(Permission.EDIT_PRODUCT), async (req, res) => {
     const { name, category_id, price, in_stock, description } = req.body;
 
     if (!name || !category_id || !price) {
@@ -106,27 +106,30 @@ router.delete("/products/:id", authToken, authorizePermission(Permission.DELETE_
     } catch (err) {
         res.status(404).json({ message: "Data Product Not Found" });
     }
-    
+
 });
 
 
-router.get("/products/search", authorizePermission(Permission.BROWSE_PRODUCTS), async (req, res) => {
-    const keyword  = req.query.search;
-    const products = await prisma.product.findMany({
+router.get("/product/search", async (req, res) => {
+    const category = await prisma.category.findFirst({
         where: {
             name: {
-                contains: keyword,
+                contains: req.query.category,
+            },
+        },
+    });
+
+    const search = await prisma.product.findMany({
+        where: {
+            category_id: category.id,
+            name: {
+                contains: req.query.name,
             },
             description: {
-                contains: keyword,
-            }
-        }
-    })
-    res.json({ products })
-})
+                contains: req.query.description,
+            },
+        },
+    });
+    res.json({ message: "Data products", products: search });
+});
 export default router;
-
-
-
-
-
