@@ -15,5 +15,11 @@ Clone the project repository from GitHub using the following command:
 
 ```bash
 git clone https://github.com/Wisnu2722/project-backend.git
+```
+### 2. Navigate to the Project Folder
 
+After successfully cloning the repository, navigate to the project folder using the `cd` command:
 
+```bash
+cd project-backend
+```
