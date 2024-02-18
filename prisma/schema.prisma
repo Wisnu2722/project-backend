@@ -50,6 +50,7 @@ model Order {
   number      String      @db.VarChar(255)
   total       Float       @default(0) @db.Float
   user_id     Int
+  status      String      @default("pending")
   created_at  DateTime    @default(now()) @db.Timestamp(0)
   updated_at  DateTime    @default(now()) @db.Timestamp(0)
   order_items OrderItem[]
@@ -64,7 +65,7 @@ model Category {
   id         Int       @id @default(autoincrement())
   name       String    @unique
   created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt @default(now()) @db.Timestamp(0)
+  updated_at DateTime  @default(now()) @updatedAt @db.Timestamp(0)
   products   Product[]
 
   @@map("categories")

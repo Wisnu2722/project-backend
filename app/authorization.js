@@ -25,6 +25,7 @@ export const Permission = {
 
     BROWSE_ORDERS: 'browse_orders',
     READ_ORDER: 'read_order',
+    EDIT_ORDER: 'edit_order',
     ADD_ORDER: 'add_order',
 
     BROWSE_ORDER_ITEMS: 'browse_order_items',
@@ -76,6 +77,7 @@ export const PermissionAssignment = {
         Permission.DELETE_CART,
 
         Permission.BROWSE_ORDERS,
+        Permission.EDIT_ORDER,
         Permission.READ_ORDER,
 
         Permission.BROWSE_ORDER_ITEMS,

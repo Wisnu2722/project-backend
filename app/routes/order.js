@@ -3,6 +3,7 @@ import prisma from "../prisma.js";
 import { Permission } from '../authorization.js'
 import authToken from "../middlewares/auth-token.js";
 import authorizePermission from "../middlewares/auth-permission.js";
+import axios from "axios";
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.get("/orders", authToken, async (req, res) => {
             return res.status(404).json({ message: 'you dont have any orders' })
         }
 
-        res.json({orders:orders});
+        res.json({ orders: orders });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -31,7 +32,7 @@ router.get("/orders", authToken, async (req, res) => {
 
 router.get("/checkout", authToken, async (req, res) => {
     const user_id = Number(req.user.id)
-    
+
     try {
         const cartData = await prisma.cart.findMany({
             where: { user_id: user_id },
@@ -84,13 +85,86 @@ router.get("/checkout", authToken, async (req, res) => {
     }
 });
 
-router.post("/order/pay", authToken,  async (req, res) => {
-    const {order_id, amount, cardNumber, cvv, expiryMonth, expiryYear} = req.body
-    vali
-    await prisma.order.update({
-        where: { id: Number(order_id) },
-    }) 
+router.post("/pay", authToken, async (req, res) => {
 
-});
+    // res.json({ message: "test" })
+    try {
+        const data = req.body;
+        const id = req.user.id;
+
+        if (!id || !data) {
+            return res
+                .status(400)
+                .json({ message: "Missing order or payment data" });
+        }
+
+        if (
+            !data.order_id ||
+            !data.cardNumber ||
+            !data.cvv ||
+            !data.expiryMonth ||
+            !data.expiryYear
+        ) {
+            return res.status(400).json({
+                message: "Missing required fields in order or payment data",
+            });
+        }
+
+        if (
+            isNaN(data.order_id) ||
+            isNaN(data.cardNumber) ||
+            isNaN(data.cvv) ||
+            isNaN(data.expiryMonth) ||
+            isNaN(data.expiryYear)
+        ) {
+            return res.status(400).json({ message: "Invalid data" });
+        }
+
+        const order = await prisma.order.findFirst({
+            where: { user_id: Number(id), id: Number(data.order_id) },
+        });
+        if (!order) {
+            return res.status(401).json({ message: "Order not found" });
+        }
+        if (order.status === "paid") {
+            return res.status(400).json({ message: "Order already paid" });
+        }
+
+        const dataPayment = {
+            amount: order.total,
+            cardNumber: data.cardNumber,
+            cvv: data.cvv,
+            expiryMonth: data.expiryMonth,
+            expiryYear: data.expiryYear,
+        };
+
+        const paymentResponse = await axios.post(
+            "http://localhost:3000/pay",
+            dataPayment
+        );
+
+        if (paymentResponse.status === 200) {
+            await prisma.order.update({
+                where: { id: order.id },
+                data: {
+                    status: "paid",
+                },
+            });
+        } else {
+            await prisma.order.update({
+                where: { id: order.id },
+                data: {
+                    status: "failed",
+                },
+            });
+        }
+
+        res.json({ message: "success", payment: paymentResponse.data });
+    } catch (error) {
+        console.error("Error processing payment:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+);
 
 export default router;

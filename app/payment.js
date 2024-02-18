@@ -47,7 +47,7 @@ const generateTransactionId = () => {
     return transactionId
 }
 
-export const processPayment = (amount, cardNumber) => {
+const processPayment = (amount, cardNumber) => {
     if (!validCardNumbers.includes(cardNumber)) {
         return { success: false, error: 'Invalid card number' }
     }
@@ -62,3 +62,4 @@ export const processPayment = (amount, cardNumber) => {
     }
 }
 
+export default processPayment
