@@ -30,11 +30,22 @@ Install all project dependencies by running the following command:
 ```bash
 npm install
 ```
+## 4. Configuration
 
-### 4. Database Migration (Optional)
+### Environment Variables
+
+The project may require certain environment variables to be set for configuration. Check the `.env.example` file for a list of required environment variables and their default values. Create a `.env` file in the project root directory and set the necessary variables.
+
+### Database Configuration
+
+Ensure that the database connection details are correctly configured in the `prisma/schema.prisma` file. Update the database URL, username, password, etc., as required for your environment.
+
+### 5. Database Migration (Optional)
 
 If you need to migrate the database that has been created in the Prisma schema, execute the following command:
 
 ```bash
 npx prisma migrate dev
 ```
+
+
