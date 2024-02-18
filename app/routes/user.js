@@ -18,8 +18,11 @@ router.get("users", async (req, res) => {
 })
 
 // Get a user by ID
-router.get("/users/:id", async (req, res) => {
+router.get("/users/:id", authToken, authorizePermission(Permission.EDIT_USER), async (req, res) => {
     const id = req.params.id;
+    if (id !== req.user.id) {
+        return res.status(401).send('Unauthorized')
+    }
     const user = await prisma.user.findUnique({
         where: {
             id: Number(id),
@@ -31,7 +34,7 @@ router.get("/users/:id", async (req, res) => {
     return res.json(user)
 })
 
-router.post("/users", async (req, res) => {
+router.post("/users", authToken, async (req, res) => {
     req.body.password = bcrypt.hashSync(req.body.password, 12)
     const user = await prisma.user.create({
         data: req.body

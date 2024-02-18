@@ -30,7 +30,7 @@ Install all project dependencies by running the following command:
 ```bash
 npm install
 ```
-## 4. Configuration
+### 4. Configuration
 
 ### Environment Variables
 
@@ -47,5 +47,72 @@ If you need to migrate the database that has been created in the Prisma schema, 
 ```bash
 npx prisma migrate dev
 ```
+## Running the Server
+
+To start the server, run the following command:
+
+```bash
+npm start
+```
+By default, the server will run on port 4200. You can specify a different port by setting the APP_PORT variable in `.env` file.
+
+## API ENDPOINTS
 
 
+### Login
+
+The purpose of login is to authenticate user and generate token. Based on information given in login process, the role of user can be identified based on their `role_id`, it could be either a seller or regular user. The login endpoint can be accessed at ```http://localhost:4200/login ```
+
+Example :
+- *Request Method :* `POST`
+- *Request Body :*
+  ```json
+  {
+    "email": "example@example.com",
+    "password": "password"
+  }
+  ```
+- *Response :*
+  ```json
+  
+    {
+        "token": "xcxgahbabsgashjgahsgahsajmanaxkja==",
+    "user": {
+        "id": 1,
+        "email": "example@example.com",
+        "name": "Smithy Werber Jager Man Jensen"
+        }
+    }
+
+## user role and permission
+### Regular User Role
+
+user with `regular_user` role, have permission:
+- can manage their account
+- browse products
+- add product to cart
+- display cart
+- checkout order
+- display order items
+- pay order
+
+### Seller
+user with `seller` role, have permission:
+- can manage their account
+- browse categories
+- add categories
+- edit categories
+- delete categories
+- browse products
+- add products
+- edit products
+- delete products
+- display carts
+- display orders
+- display order items
+
+## Products Endpoints
+### browse product
+*Request Method :* `GET`
+
+api endpoint : `http://localhost:4200/products`
