@@ -30,7 +30,7 @@ router.get("/orders", authToken, async (req, res) => {
     }
 });
 
-router.get("/checkout", authToken, async (req, res) => {
+router.get("/checkout", authToken, authorizePermission(Permission.EDIT_ORDER), async (req, res) => {
     const user_id = Number(req.user.id)
 
     try {
@@ -87,7 +87,6 @@ router.get("/checkout", authToken, async (req, res) => {
 
 router.post("/pay", authToken, async (req, res) => {
 
-    // res.json({ message: "test" })
     try {
         const data = req.body;
         const id = req.user.id;
@@ -161,8 +160,10 @@ router.post("/pay", authToken, async (req, res) => {
 
         res.json({ message: "success", payment: paymentResponse.data });
     } catch (error) {
-        console.error("Error processing payment:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+            message: "Payment failed",
+            error: "Invalid card number"
+        });
     }
 }
 );
